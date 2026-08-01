@@ -1,0 +1,12 @@
+[project]
+name = "reservation-intelligence-platform"
+version = "0.1.0"
+description = "Reservation conversion data pipeline plus enterprise RAG and agentic analytics"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100

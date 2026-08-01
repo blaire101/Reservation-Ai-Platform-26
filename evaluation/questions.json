@@ -1,0 +1,33 @@
+[
+  {
+    "question": "What is the grain of the reservation conversion mart?",
+    "expected_route": "KNOWLEDGE",
+    "expected_source": "table_dictionary.md"
+  },
+  {
+    "question": "How is a reservation matched to an order?",
+    "expected_route": "KNOWLEDGE",
+    "expected_source": "table_dictionary.md"
+  },
+  {
+    "question": "What does reserved-not-paid mean?",
+    "expected_route": "KNOWLEDGE",
+    "expected_source": "metric_definitions.md"
+  },
+  {
+    "question": "Show paid conversion rate by site.",
+    "expected_route": "ANALYTICS"
+  },
+  {
+    "question": "Which campaign has the lowest paid conversion rate?",
+    "expected_route": "ANALYTICS"
+  },
+  {
+    "question": "How many users reserved but did not pay?",
+    "expected_route": "ANALYTICS"
+  },
+  {
+    "question": "Why is the Singapore reservation dashboard incomplete on 2026-07-31?",
+    "expected_route": "QUALITY"
+  }
+]

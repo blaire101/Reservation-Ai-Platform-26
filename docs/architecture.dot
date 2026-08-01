@@ -1,0 +1,26 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.45", ranksep="0.65"];
+  node [shape=box, style="rounded,filled", fillcolor="#F5F9FC", color="#7FA8C5", fontname="Arial", fontsize=11, margin="0.16,0.10"];
+  edge [color="#4D7896", penwidth=1.4, arrowsize=0.8];
+  raw [label="Landed Business Data
+Campaign · Product · Reservation · Order"];
+  docs [label="Enterprise Documents
+Business · Metrics · Dictionary · Runbook"];
+  pipe [label="Data Pipeline
+PySpark / pandas"];
+  kpipe [label="Knowledge Pipeline
+LlamaIndex / Keyword Fallback"];
+  mart [label="DM Reservation Conversion Mart
+User × Campaign × Product × Site", fillcolor="#EAF6EF", color="#5B9B72"];
+  index [label="Knowledge Index", fillcolor="#FFF7E8", color="#C69A4B"];
+  agentgraph [label="LangGraph Agentic Workflow", fillcolor="#EAF1FF", color="#557FB8"];
+  rag [label="Knowledge Tool"];
+  analytics [label="Analytics Tool"];
+  quality [label="Quality Tool"];
+  answer [label="Answer + Evidence + Tool Output", fillcolor="#F4ECFA", color="#8D69A6"];
+  raw -> pipe -> mart -> agentgraph;
+  docs -> kpipe -> index -> agentgraph;
+  agentgraph -> rag -> answer;
+  agentgraph -> analytics -> answer;
+  agentgraph -> quality -> answer;
+}

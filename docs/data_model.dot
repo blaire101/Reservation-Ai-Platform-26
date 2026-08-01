@@ -1,0 +1,16 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad=0.3, nodesep=0.6, ranksep=0.8, fontname="Arial"];
+  node [shape=record, style="rounded,filled", fillcolor="#F8FAFC", color="#64748B", fontname="Arial", fontsize=10];
+  edge [color="#64748B", fontname="Arial", fontsize=9];
+
+  campaign [label="{dim_campaign|campaign_id (PK)\lcampaign_name\lproduct_id\lsite\lreservation window\lsale_start_time\lconversion_end_time\l}"];
+  product [label="{dim_product|product_id (PK)\lproduct_name\lproduct_category\llaunch_date\l}"];
+  reservation [label="{fact_reservation|reservation_id (PK)\luser_id\lcampaign_id\lproduct_id\lsite\lreservation_time\lingestion_time\l}", fillcolor="#EEF6FF"];
+  order [label="{fact_order|order_id (PK)\luser_id\lproduct_id\lsite\lorder_time\lorder_status\lpayment_status\lpayment_time\lorder_amount\l}", fillcolor="#EEF6FF"];
+  mart [label="{dm_reservation_conversion|user_id + campaign_id + product_id + site\lreservation_time\lorder_id / order_time\lpayment_status / payment_time\lreserve_flag\lorder_flag\lpaid_flag\lreserved_not_paid_flag\l}", fillcolor="#ECFDF5", color="#10B981"];
+
+  campaign -> reservation [label="campaign_id + product_id + site"];
+  product -> reservation [label="product_id"];
+  reservation -> mart [label="base journey"];
+  order -> mart [label="user + product + site\nwithin conversion window"];
+}

@@ -1,0 +1,8 @@
+-r requirements-lite.txt
+langchain>=1.0,<2
+langgraph>=1.0,<2
+langchain-openai>=0.3,<2
+llama-index-core>=0.12,<1
+llama-index-embeddings-huggingface>=0.5,<1
+sentence-transformers>=3.3,<6
+pyspark>=3.5,<4

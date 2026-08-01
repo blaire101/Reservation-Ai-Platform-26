@@ -1,0 +1,5 @@
+campaign_id,campaign_name,product_id,site,reservation_start_time,reservation_end_time,sale_start_time,conversion_end_time
+C001,SG Smartphone Launch,P001,SG,2026-07-01,2026-07-09,2026-07-10,2026-07-20
+C002,MY Smart Home Launch,P002,MY,2026-07-02,2026-07-11,2026-07-12,2026-07-22
+C003,SG Tablet Launch,P003,SG,2026-07-08,2026-07-17,2026-07-18,2026-07-28
+C004,MY Wearable Launch,P004,MY,2026-07-10,2026-07-19,2026-07-20,2026-07-30

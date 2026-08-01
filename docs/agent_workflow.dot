@@ -1,0 +1,20 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad=0.3, nodesep=0.5, ranksep=0.55, fontname="Arial"];
+  node [shape=box, style="rounded,filled", fillcolor="#F8FAFC", color="#64748B", fontname="Arial", fontsize=10, margin="0.16,0.10"];
+  edge [color="#64748B", fontname="Arial", fontsize=9];
+
+  q [label="User question", fillcolor="#EEF2FF"];
+  router [label="LangGraph intent router\nKNOWLEDGE / ANALYTICS / QUALITY", fillcolor="#FFF7ED"];
+  k [label="Knowledge route\nLlamaIndex or keyword retrieval\nBusiness docs + source evidence", fillcolor="#EFF6FF"];
+  a [label="Analytics route\nApproved metric + dimension plan\nControlled SQL on DM", fillcolor="#ECFDF5"];
+  d [label="Quality route\nFreshness, completeness, nulls, duplicates\nDeterministic checks", fillcolor="#FEF2F2"];
+  out [label="Structured answer\nroute + result + evidence + warnings", fillcolor="#F5F3FF"];
+
+  q -> router;
+  router -> k [label="knowledge"];
+  router -> a [label="analytics"];
+  router -> d [label="quality"];
+  k -> out;
+  a -> out;
+  d -> out;
+}
