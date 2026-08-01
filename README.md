@@ -2,9 +2,29 @@
 
 > A compact, end-to-end Data & AI project for analysing the journey from **product reservation to order and final payment**.
 
-![Architecture](docs/architecture.png)
+> 🌐 **Interactive HTML guide:** [`Open project_guide.html`](project_guide.html) — tabbed, bilingual, audio-enabled, with architecture and workflow diagrams.
+>
+> For the best experience, clone or download the repository and open `project_guide.html` in a browser.
 
-## 1. Project at a glance
+<!-- TOC START -->
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Business and Data Model](#2-business-and-data-model)
+3. [Data Engineering](#3-data-engineering)
+4. [GenAI and Agentic Workflow](#4-genai-and-agentic-workflow)
+5. [Architecture and Deployment](#5-architecture-and-deployment)
+6. [Setup and Execution](#6-setup-and-execution)
+7. [Testing and Evaluation](#7-testing-and-evaluation)
+8. [Interview and Future Development](#8-interview-and-future-development)
+
+<!-- TOC END -->
+
+## 1. Project Overview
+
+This section explains the business problem, project boundaries, and the complete STAR story. It corresponds to **Tab 1 — Overview & STAR** in the interactive HTML guide.
+
+### Project at a Glance
 
 A global consumer-electronics company launches reservation campaigns for product models such as smartphones, tablets, robot vacuums, smart watches, and other smart-home devices across different country sites.
 
@@ -27,9 +47,9 @@ The project uses only synthetic data and generalized business rules. It contains
 
 ---
 
-## 2. STAR project story
+### STAR Project Story
 
-### Situation
+#### Situation
 
 Reservation, order, campaign, and product data are available in separate landed datasets. Business definitions are also scattered across requirements, metric definitions, table dictionaries, and operational runbooks.
 
@@ -43,7 +63,7 @@ Analysts repeatedly depend on data engineers to answer questions such as:
 
 The result is slow analysis, repeated SQL work, inconsistent metric interpretation, and avoidable operational support.
 
-### Task
+#### Task
 
 Build a small but complete platform that:
 
@@ -53,11 +73,11 @@ Build a small but complete platform that:
 4. routes user questions to the correct knowledge, analytics, or quality capability;
 5. remains locally reproducible while showing how it could be deployed on AWS.
 
-### Action
+#### Action
 
 The project implements two coordinated pipelines and one controlled agent layer.
 
-#### Structured-data pipeline
+##### Structured-data pipeline
 
 ```text
 Synthetic landed CSV files
@@ -84,7 +104,7 @@ Key modelling decisions:
 - the first valid order is selected when more than one candidate exists;
 - reserved-but-not-paid includes both no-order and payment-failed cases.
 
-#### Knowledge pipeline
+##### Knowledge pipeline
 
 ```text
 Business requirement
@@ -100,7 +120,7 @@ or LlamaIndex vector retrieval in full mode
 Answer with supporting source excerpts
 ```
 
-#### Agentic workflow
+##### Agentic workflow
 
 ```text
 User question
@@ -116,7 +136,7 @@ Structured answer + evidence
 
 LangChain exposes the domain tools, LangGraph manages routing and state, and LlamaIndex provides the optional semantic retrieval backend.
 
-### Result
+#### Result
 
 The repository provides a complete, runnable workflow that can:
 
@@ -132,9 +152,9 @@ Evaluation scores are intentionally not hard-coded in this README. Run the suppl
 
 ---
 
-## 3. Business scope
+### Scope and Assumptions
 
-### Included
+#### Included
 
 - product-model reservation campaigns;
 - multiple country sites;
@@ -146,7 +166,7 @@ Evaluation scores are intentionally not hard-coded in this README. Run the suppl
 - governed analytics;
 - deterministic data-quality diagnosis.
 
-### Deliberately excluded from the MVP
+#### Deliberately excluded from the MVP
 
 - website SDK or event-tracking implementation;
 - source-system CDC implementation;
@@ -170,34 +190,15 @@ The GitHub demo uses local CSV files. The AWS section shows how those landed fil
 
 ---
 
-## 4. Architecture
+## 2. Business and Data Model
 
-![End-to-end architecture](docs/architecture.png)
+This section defines the reservation business flow, source tables, DM grain, attribution logic, and governed metrics. It corresponds to **Tab 2 — Business & Data Model** in the interactive HTML guide.
 
-### Component responsibilities
-
-| Component | Responsibility |
-|---|---|
-| `pandas` | lightweight, fast local transformation path |
-| `PySpark` | optional scalable transformation path |
-| `SQLite` | locally reproducible analytical store |
-| `LlamaIndex` | optional document ingestion, embeddings, indexing, and semantic retrieval |
-| `LangChain` | tool definitions and model-facing interfaces |
-| `LangGraph` | state, intent routing, conditional workflow, and fallback execution |
-| `FastAPI` | programmatic API |
-| `Streamlit` | interactive demonstration UI |
-| `pytest` | unit and integration testing |
-| Docker Compose | reproducible API and UI startup |
-
-The application works in a lightweight deterministic mode without an external LLM key. The full dependency set adds LangGraph, LangChain, LlamaIndex, local embeddings, and PySpark.
-
----
-
-## 5. Data model
+### Data Model
 
 ![Data model](docs/data_model.png)
 
-### Source tables
+#### Source tables
 
 | Table | Grain | Main purpose |
 |---|---|---|
@@ -206,7 +207,7 @@ The application works in a lightweight deterministic mode without an external LL
 | `fact_reservation` | one reservation event | user, campaign, product, site, reservation time, ingestion time |
 | `fact_order` | one order | user, product, site, order status, final payment status, amount, and times |
 
-### Core DM
+#### Core DM
 
 `dm_reservation_conversion`
 
@@ -218,7 +219,7 @@ user_id × campaign_id × product_id × site
 
 One row represents one user's reservation for one product model within one campaign and country site.
 
-### Core fields
+#### Core fields
 
 | Field | Meaning |
 |---|---|
@@ -233,7 +234,7 @@ One row represents one user's reservation for one product model within one campa
 | `reserved_not_paid_flag` | valid reservation exists but successful payment does not |
 | `partition_date` | reservation-date partition used by the demo |
 
-### Attribution rule
+#### Attribution rule
 
 A reservation is matched to an order when all conditions are true:
 
@@ -247,13 +248,13 @@ same user_id
 
 When multiple candidate orders exist, the pipeline selects the first valid order by `order_time`.
 
-### Why payment is not a separate table
+#### Why payment is not a separate table
 
 Real payment platforms often require a separate payment-attempt fact because one order may have multiple failed and successful attempts. This MVP stores only the final payment result on `fact_order` to keep the project focused on Data & AI integration rather than payment-event modelling.
 
 ---
 
-## 6. Metrics
+### Business Rules and Metrics
 
 | Metric | Definition |
 |---|---|
@@ -277,7 +278,46 @@ The analytics layer does not execute arbitrary LLM-generated SQL. It converts su
 
 ---
 
-## 7. AI agent design
+## 3. Data Engineering
+
+This section focuses on the engineering design behind the structured-data pipeline and deterministic data-quality controls. It corresponds to **Tab 3 — Technology: Data Engineering** in the interactive HTML guide.
+
+### Pipeline Overview
+
+```text
+Landed campaign, product, reservation, and order data
+        ↓
+Schema validation and timestamp standardisation
+        ↓
+Reservation deduplication and reference-data enrichment
+        ↓
+Time-window attribution to the first valid order
+        ↓
+DM reservation conversion mart
+        ↓
+Governed analytics and data-quality checks
+```
+
+Core engineering concerns include reproducibility, clear table grain, deterministic attribution, idempotent reruns, partition completeness, and auditable quality results.
+
+### Data-quality Design
+
+The quality route executes deterministic checks rather than asking an LLM to calculate data quality.
+
+| Check | Purpose |
+|---|---|
+| partition completeness | compare actual rows with a historical baseline |
+| duplicate rate | detect repeated `reservation_id` values |
+| null rate | validate key business columns |
+| freshness | measure ingestion delay from source event time |
+
+The agent explains the structured result and recommended action, but the actual pass/fail decision remains deterministic and testable.
+
+---
+
+## 4. GenAI and Agentic Workflow
+
+This section explains the knowledge pipeline, LangChain tools, LangGraph routing, and the controlled AI-agent design. It corresponds to **Tab 4 — Technology: GenAI & Agents** in the interactive HTML guide.
 
 ![Agent workflow](docs/agent_workflow.png)
 
@@ -289,7 +329,7 @@ The MVP uses **one controlled agentic workflow with three domain routes**, not a
 | `ANALYTICS` | Show paid conversion rate by site | parse an approved query plan and execute controlled SQL |
 | `QUALITY` | Why is the SG dashboard incomplete? | execute deterministic data-quality checks |
 
-### Why this is an AI agent rather than only RAG
+#### Why this is an AI agent rather than only RAG
 
 The workflow performs more than retrieve-and-generate:
 
@@ -303,13 +343,86 @@ understand intent
 
 It includes state, tool selection, conditional routing, structured output, evidence, and deterministic fallback behaviour.
 
-### Why AutoGen is not included
+#### Why AutoGen is not included
 
 Adding AutoGen would introduce a second orchestration framework with overlapping responsibilities. LangGraph is sufficient for explicit state and routing in this scope. A supervisor-and-specialist multi-agent extension can be added later without changing the core data model.
 
 ---
 
-## 8. Repository structure
+## 5. Architecture and Deployment
+
+This section combines the end-to-end architecture, local and AWS deployment mappings, and security controls. It corresponds to **Tab 5 — Architecture & Workflows** in the interactive HTML guide.
+
+### End-to-end Architecture
+
+![End-to-end architecture](docs/architecture.png)
+
+#### Component responsibilities
+
+| Component | Responsibility |
+|---|---|
+| `pandas` | lightweight, fast local transformation path |
+| `PySpark` | optional scalable transformation path |
+| `SQLite` | locally reproducible analytical store |
+| `LlamaIndex` | optional document ingestion, embeddings, indexing, and semantic retrieval |
+| `LangChain` | tool definitions and model-facing interfaces |
+| `LangGraph` | state, intent routing, conditional workflow, and fallback execution |
+| `FastAPI` | programmatic API |
+| `Streamlit` | interactive demonstration UI |
+| `pytest` | unit and integration testing |
+| Docker Compose | reproducible API and UI startup |
+
+The application works in a lightweight deterministic mode without an external LLM key. The full dependency set adds LangGraph, LangChain, LlamaIndex, local embeddings, and PySpark.
+
+---
+
+### AWS Reference Architecture
+
+The repository is locally reproducible and cloud-portable. The AWS reference maps the same logical components as follows:
+
+| Local demo | AWS reference |
+|---|---|
+| CSV landed files | Amazon S3 raw zone |
+| pandas / local PySpark | AWS Glue Spark jobs |
+| DM CSV | partitioned Parquet on S3 |
+| SQLite | Amazon Athena with Glue Data Catalog |
+| local document directory | Amazon S3 knowledge-document prefix |
+| local vector index | OpenSearch Serverless or PostgreSQL with pgvector |
+| model adapter | Amazon Bedrock |
+| FastAPI and Streamlit containers | Amazon ECS on Fargate |
+| local logs | Amazon CloudWatch |
+| local environment variables | AWS Secrets Manager / Systems Manager Parameter Store |
+
+See [`infrastructure/aws-reference/README.md`](infrastructure/aws-reference/README.md) for the reference deployment boundary.
+
+Important distinction:
+
+> The GitHub implementation does not claim that its sample data is already stored in a real AWS account. AWS is a reference deployment target; the default demo is local and reproducible.
+
+---
+
+### Security and Governance
+
+The MVP demonstrates several practical controls:
+
+- allow-listed dimensions and metrics;
+- controlled SQL generation rather than arbitrary text-to-SQL;
+- read-only analytical execution;
+- source evidence for knowledge answers;
+- environment-based secret handling;
+- deterministic quality rules;
+- synthetic public-safe data;
+- explicit project scope and architecture decisions.
+
+Potential production additions include row-level security, metric-version metadata, query auditing, PII masking, model tracing, prompt-injection filtering, and human approval for higher-risk actions.
+
+---
+
+## 6. Setup and Execution
+
+This section contains the repository layout, prerequisites, environment configuration, local execution, Docker startup, demo walkthrough, and common commands. It corresponds to **Tab 6 — Build & Run** in the interactive HTML guide.
+
+### Project Structure
 
 ```text
 reservation-intelligence-platform/
@@ -360,15 +473,15 @@ Generated Python caches, test caches, local virtual environments, IDE settings, 
 
 ---
 
-## 9. Prerequisites
+### Prerequisites
 
-### Lightweight mode
+#### Lightweight mode
 
 - Python 3.11 or later
 - `pip`
 - GNU Make is convenient but optional
 
-### Full mode
+#### Full mode
 
 In addition to the lightweight requirements:
 
@@ -376,16 +489,16 @@ In addition to the lightweight requirements:
 - enough local memory for PySpark and the embedding model;
 - internet access during first model download when using the LlamaIndex Hugging Face backend.
 
-### Docker mode
+#### Docker mode
 
 - Docker Engine or Docker Desktop
 - Docker Compose v2
 
 ---
 
-## 10. Setup and run
+### Local Setup and Execution
 
-### Option A — recommended lightweight local setup
+#### Option A — recommended lightweight local setup
 
 Clone the repository:
 
@@ -440,7 +553,7 @@ Ask a CLI question:
 python -m app.cli "Show paid conversion rate by site"
 ```
 
-### Option B — full AI and PySpark mode
+#### Option B — full AI and PySpark mode
 
 Install the full dependencies:
 
@@ -458,7 +571,7 @@ make bootstrap
 
 The first semantic-retrieval run may download the configured embedding model.
 
-### Option C — Docker Compose
+#### Option C — Docker Compose
 
 Build and start both API and UI:
 
@@ -477,7 +590,7 @@ Stop the services:
 docker compose down
 ```
 
-### Option D — run services separately
+#### Option D — run services separately
 
 Start the API:
 
@@ -493,7 +606,7 @@ streamlit run streamlit_app.py
 
 ---
 
-## 11. Configuration
+### Configuration
 
 Copy the example file when local overrides are needed:
 
@@ -514,9 +627,9 @@ Never commit `.env` or real API keys. The included `.gitignore` excludes them.
 
 ---
 
-## 12. Demo walkthrough
+### Demo Walkthrough
 
-### Step 1 — generate landed source data
+#### Step 1 — generate landed source data
 
 ```bash
 python pipelines/generate_sample_data.py
@@ -533,7 +646,7 @@ fact_order.csv
 
 The random generator is seeded, so the output is reproducible.
 
-### Step 2 — build the DM
+#### Step 2 — build the DM
 
 ```bash
 python pipelines/build_reservation_mart.py
@@ -548,7 +661,7 @@ data/warehouse/reservation.db
 
 The SQLite file is a generated local runtime artifact and is ignored by Git.
 
-### Step 3 — ask knowledge questions
+#### Step 3 — ask knowledge questions
 
 ```bash
 python -m app.cli "What is the grain of the reservation conversion mart?"
@@ -558,7 +671,7 @@ python -m app.cli "What does reserved-not-paid mean?"
 
 Expected route: `KNOWLEDGE`.
 
-### Step 4 — ask analytics questions
+#### Step 4 — ask analytics questions
 
 ```bash
 python -m app.cli "Show paid conversion rate by site"
@@ -568,7 +681,7 @@ python -m app.cli "How many users reserved but did not pay by product category?"
 
 Expected route: `ANALYTICS`.
 
-### Step 5 — diagnose a quality issue
+#### Step 5 — diagnose a quality issue
 
 ```bash
 python -m app.cli "Why is the Singapore reservation dashboard incomplete on 2026-07-31?"
@@ -578,7 +691,35 @@ The sample generator deliberately creates an incomplete SG partition for that da
 
 ---
 
-## 13. Testing
+### Useful Commands
+
+```bash
+make bootstrap   # generate data and build the DM
+make test        # run pytest
+make eval        # run evaluation
+make api         # start FastAPI
+make ui          # start Streamlit
+make clean       # remove generated local data outputs
+```
+
+Before committing to GitHub, verify the repository is clean:
+
+```bash
+find . -type d -name __pycache__ -prune -exec rm -rf {} +
+rm -rf .pytest_cache .mypy_cache .ruff_cache
+find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+git status
+```
+
+These files are already covered by `.gitignore`, but cleaning them before the first commit keeps the uploaded archive tidy.
+
+---
+
+## 7. Testing and Evaluation
+
+This section describes automated testing, routing and retrieval evaluation, analytics validation, and reproducible result reporting. It corresponds to **Tab 7 — Quality, Tests & Evaluation** in the interactive HTML guide.
+
+### Testing
 
 Run the full test suite:
 
@@ -608,7 +749,7 @@ pytest --cov=app --cov=pipelines --cov-report=term-missing
 
 ---
 
-## 14. Evaluation
+### Evaluation
 
 Run:
 
@@ -628,126 +769,35 @@ Do not publish invented scores. Copy the output generated by the current commit 
 
 ---
 
-## 15. Data-quality design
+## 8. Interview and Future Development
 
-The quality route executes deterministic checks rather than asking an LLM to calculate data quality.
+This section explains the main engineering trade-offs, interview narrative, resume wording, current limitations, and extension roadmap. It corresponds to **Tab 8 — Interview & Roadmap** in the interactive HTML guide.
 
-| Check | Purpose |
-|---|---|
-| partition completeness | compare actual rows with a historical baseline |
-| duplicate rate | detect repeated `reservation_id` values |
-| null rate | validate key business columns |
-| freshness | measure ingestion delay from source event time |
+### Engineering Decisions and Trade-offs
 
-The agent explains the structured result and recommended action, but the actual pass/fail decision remains deterministic and testable.
-
----
-
-## 16. Security and governance controls
-
-The MVP demonstrates several practical controls:
-
-- allow-listed dimensions and metrics;
-- controlled SQL generation rather than arbitrary text-to-SQL;
-- read-only analytical execution;
-- source evidence for knowledge answers;
-- environment-based secret handling;
-- deterministic quality rules;
-- synthetic public-safe data;
-- explicit project scope and architecture decisions.
-
-Potential production additions include row-level security, metric-version metadata, query auditing, PII masking, model tracing, prompt-injection filtering, and human approval for higher-risk actions.
-
----
-
-## 17. AWS reference architecture
-
-The repository is locally reproducible and cloud-portable. The AWS reference maps the same logical components as follows:
-
-| Local demo | AWS reference |
-|---|---|
-| CSV landed files | Amazon S3 raw zone |
-| pandas / local PySpark | AWS Glue Spark jobs |
-| DM CSV | partitioned Parquet on S3 |
-| SQLite | Amazon Athena with Glue Data Catalog |
-| local document directory | Amazon S3 knowledge-document prefix |
-| local vector index | OpenSearch Serverless or PostgreSQL with pgvector |
-| model adapter | Amazon Bedrock |
-| FastAPI and Streamlit containers | Amazon ECS on Fargate |
-| local logs | Amazon CloudWatch |
-| local environment variables | AWS Secrets Manager / Systems Manager Parameter Store |
-
-See [`infrastructure/aws-reference/README.md`](infrastructure/aws-reference/README.md) for the reference deployment boundary.
-
-Important distinction:
-
-> The GitHub implementation does not claim that its sample data is already stored in a real AWS account. AWS is a reference deployment target; the default demo is local and reproducible.
-
----
-
-## 18. Engineering decisions and trade-offs
-
-### Product model instead of SKU
+#### Product model instead of SKU
 
 Reservation is modelled at product level. Users select colour, capacity, and other SKU attributes during ordering. This keeps the reservation grain stable and the demo easy to understand.
 
-### Final payment state in the order table
+#### Final payment state in the order table
 
 A separate payment-attempt fact is unnecessary for the current analytical questions. It can be introduced later when retry behaviour or payment-channel analysis becomes relevant.
 
-### One agent with three tools
+#### One agent with three tools
 
 The three tasks share one domain and one analytical mart. A supervisor plus multiple specialist agents would add token cost and debugging complexity without improving the MVP result.
 
-### Controlled analytics instead of unrestricted text-to-SQL
+#### Controlled analytics instead of unrestricted text-to-SQL
 
 The application supports approved metrics and dimensions. This makes results deterministic, secure, testable, and easier to explain in an enterprise interview.
 
-### Lightweight and full modes
+#### Lightweight and full modes
 
 The keyword/pandas mode reduces installation time and supports CI. The LlamaIndex/PySpark mode demonstrates the intended production-style capabilities without making them mandatory for every reviewer.
 
 ---
 
-## 19. Extending the project
-
-A sensible progression is:
-
-### Version 2
-
-- PDF, DOCX, XLSX, and PPTX ingestion;
-- hybrid dense-plus-keyword retrieval;
-- reranking and citation validation;
-- richer date and filter parsing;
-- FastAPI-to-Streamlit API integration;
-- persisted vector store;
-- LangSmith or OpenTelemetry tracing.
-
-### Version 3
-
-- S3 and Glue deployment;
-- Athena query adapter;
-- Bedrock model adapter;
-- ECS deployment;
-- event-driven ingestion;
-- human approval for selected actions;
-- supervisor-based specialist agents for cross-domain investigation.
-
-### Reusable lifecycle scenarios
-
-The same milestone-based architecture can later support:
-
-```text
-Merchant registration → KYC → store binding → first settlement
-Loan application → review → approval → disbursement
-Membership registration → activation → first transaction
-```
-
-The current repository intentionally keeps only `Reservation → Order → Payment` as the main demo.
-
----
-
-## 20. Interview talking points
+### Interview Explanation
 
 A concise explanation:
 
@@ -768,7 +818,7 @@ Be prepared to explain:
 
 ---
 
-## 21. Resume-ready description
+### Resume Description
 
 **Reservation Intelligence Data & AI Platform**
 
@@ -779,30 +829,44 @@ Be prepared to explain:
 
 ---
 
-## 22. Useful commands
+### Roadmap
 
-```bash
-make bootstrap   # generate data and build the DM
-make test        # run pytest
-make eval        # run evaluation
-make api         # start FastAPI
-make ui          # start Streamlit
-make clean       # remove generated local data outputs
+A sensible progression is:
+
+#### Version 2
+
+- PDF, DOCX, XLSX, and PPTX ingestion;
+- hybrid dense-plus-keyword retrieval;
+- reranking and citation validation;
+- richer date and filter parsing;
+- FastAPI-to-Streamlit API integration;
+- persisted vector store;
+- LangSmith or OpenTelemetry tracing.
+
+#### Version 3
+
+- S3 and Glue deployment;
+- Athena query adapter;
+- Bedrock model adapter;
+- ECS deployment;
+- event-driven ingestion;
+- human approval for selected actions;
+- supervisor-based specialist agents for cross-domain investigation.
+
+#### Reusable lifecycle scenarios
+
+The same milestone-based architecture can later support:
+
+```text
+Merchant registration → KYC → store binding → first settlement
+Loan application → review → approval → disbursement
+Membership registration → activation → first transaction
 ```
 
-Before committing to GitHub, verify the repository is clean:
-
-```bash
-find . -type d -name __pycache__ -prune -exec rm -rf {} +
-rm -rf .pytest_cache .mypy_cache .ruff_cache
-find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
-git status
-```
-
-These files are already covered by `.gitignore`, but cleaning them before the first commit keeps the uploaded archive tidy.
+The current repository intentionally keeps only `Reservation → Order → Payment` as the main demo.
 
 ---
 
-## 23. Disclaimer
+### Disclaimer
 
 This project is a portfolio and learning implementation. All data is synthetic, company names are generalized, and architecture choices are simplified for clarity and reproducibility. No production SLA, security certification, or live AWS deployment is claimed.
