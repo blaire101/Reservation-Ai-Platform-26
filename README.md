@@ -5,7 +5,7 @@
 
 ## Interactive Project Guide
 
-[![Open HTML Guide](https://img.shields.io/badge/Open-Interactive_HTML_Guide-2971A8?style=for-the-badge&logo=html5&logoColor=white)](https://htmlpreview.github.io/?https://github.com/blaire101/reservation-ai-platform/blob/main/project_guide.html)
+[![Open HTML Guide](https://img.shields.io/badge/Open-Interactive_HTML_Guide-2971A8?style=for-the-badge&logo=html5&logoColor=white)](https://htmlpreview.github.io/?https://github.com/blaire101/reservation-ai-platform-26/blob/main/project_guide.html)
 
 > Includes interactive tabs, architecture diagrams, English pronunciation, and concise Chinese translations.
 
