@@ -2,8 +2,13 @@
 
 > A compact, end-to-end Data & AI project for analysing the journey from **product reservation to order and final payment**.
 
-> 🌐 **Interactive HTML guide:** [`Open project_guide.html`](project_guide.html) — tabbed, bilingual, audio-enabled, with architecture and workflow diagrams.
->
+
+## Interactive Project Guide
+
+[![Open HTML Guide](https://img.shields.io/badge/Open-Interactive_HTML_Guide-2971A8?style=for-the-badge&logo=html5&logoColor=white)](https://htmlpreview.github.io/?https://github.com/blaire101/reservation-ai-platform/blob/main/project_guide.html)
+
+> Includes interactive tabs, architecture diagrams, English pronunciation, and concise Chinese translations.
+
 > For the best experience, clone or download the repository and open `project_guide.html` in a browser.
 
 <!-- TOC START -->
